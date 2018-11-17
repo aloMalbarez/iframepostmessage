@@ -1,0 +1,156 @@
+<!-- https://es.stackoverflow.com/q/207601/81450 -->
+<!-- Padre-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Emisor y Receptor Prueba</title>
+</head>
+<body>
+  <div style="width:45%; float:left;">
+    <h1>Claseee A</h1>
+    <h2 class="prueba">Ocultame iFreim!</h2>
+    <button id="elBotonSaludar">Saludar Iframe</button>
+    <p>
+      <input id="elTexto" name="elTexto" type="text" />
+      <!--Boton que genera la accion en el hijo -->
+      <button id="elBoton">Oprima porfavor (Desde parent)</button>
+    </p>
+    <br />
+    <div id="losMensajes"></div>
+  </div>
+  <iframe id="elIframe" class="buscadoriframe" src="hijo.html" width="45%" height="320px;" style="float:left;"></iframe>
+  <script>
+
+  window.addEventListener("message", recibirMensages, false);
+
+  function recibirMensages(ev)
+  {
+    /*
+    // Para seguridad verificar el dominio de origen aqui
+    if (ev.origin !== "http://example.org:8080")
+    return;
+    //*/
+
+    // Mostramos por consola el origen, tipo y mensaje crudo
+    console.log(ev.origin, typeof ev.data, ev.data);
+
+    // si es string lo añadimos como texto al div "losMensajes"
+    // intToRGB(hashCode(ev.data.accion)) es usado
+    // para colorear segun el texto
+    if('string'==typeof ev.data){
+      document.getElementById('losMensajes').innerHTML +=
+      '<span style="color:#'+intToRGB(hashCode(ev.data))+'">'+
+      '('+ev.origin+') dice:</span> ' +
+      ev.data + "<br/>";
+    }
+
+    // si es object buscamos que sea una accion y que hacer
+    if('object'==typeof ev.data){
+      // si accion esta definido y cosas no está vacío
+      //  lo añadimos como texto al div "losMensajes"
+      // intToRGB(hashCode(ev.data.accion)) es usado
+      // para colorear segun la accion
+      if(ev.data.accion && ev.data.cosas){
+        document.getElementById('losMensajes').innerHTML +=
+        '<span style="color:#'+intToRGB(hashCode(ev.data.accion))+'">'+
+          '('+ev.origin+') dice:</span> ' +
+          ev.data.accion + " " +
+          JSON.stringify(ev.data.cosas) + "<br/>";
+
+          // aquí según el tipo de accion
+          // procesamos las cosas de manera diferente
+
+          switch (ev.data.accion){
+            // si es buscar, mentir
+            case 'buscar':
+            document.getElementById('losMensajes').innerHTML +=
+            "[*] Estoy buscando " + ev.data.cosas + "<br/>";
+            break;
+
+            // si es cambiar, buscar que cambiar y como
+            case 'cambiar':
+            document.getElementById('losMensajes').innerHTML +=
+            "[*] Estoy cambiando cosas<br/>";
+
+            // recorremos las cosas
+            for (var que in ev.data.cosas){
+
+              // hay una clase para agregar?
+              if (ev.data.cosas[que].clase){
+                // avisamos que hacemos
+                document.getElementById('losMensajes').innerHTML +=
+                '[**] agregandole la clase "' +
+                ev.data.cosas[que].clase + '" a "' + que + '"<br/>';
+                // lo hacemos :
+                // para cada elemento encontrado agregar la clase
+                document.querySelectorAll(que).forEach(function(el){
+                  el.classList.add(ev.data.cosas[que].clase)
+                })
+              }
+
+              // hay estilos para cambiar?
+              if (ev.data.cosas[que].estilos){
+                // avisamos que hacemos
+                document.getElementById('losMensajes').innerHTML +=
+                '[**] agregandole estilos "' +
+                JSON.stringify(ev.data.cosas[que].estilos) + '" a "' + que + '"<br/>';
+                // lo hacemos :
+                // para cada elemento encontrado cambiar los estilos
+                document.querySelectorAll(que).forEach(function(el){
+                  // cambiamos los estilos uno por uno
+                  for(var e in ev.data.cosas[que].estilos) {
+                    el.style[e] = ev.data.cosas[que].estilos[e];
+                  }
+                })
+              }
+            }
+            break;
+
+          }
+        }
+      }
+
+
+      // Definimos como procesar los mensajes
+    }
+
+    var soyTuHijo = document.getElementById('elIframe').contentWindow;
+    // Saludo Genérico
+    document.getElementById('elBotonSaludar').onclick = function(){
+      // Para seguridad definir el dominio de origen aqui en vez de '*'
+      soyTuHijo.postMessage(
+      "Hola Luke!",
+      '*'
+      );
+    }
+
+    // Mensaje personalizado :
+    // enviamos el valor del input como string
+    document.getElementById('elBoton').onclick = function(){
+      var mensajeParaEnviar = document.getElementById('elTexto').value;
+
+      // Para seguridad definir el dominio de origen aqui en vez de '*'
+      soyTuHijo.postMessage( mensajeParaEnviar, '*' );
+    }
+
+
+    //** extras **//
+    /* https://stackoverflow.com/a/3426956/1423096 */
+    function hashCode(str) { // java String#hashCode
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+    }
+
+    function intToRGB(i){
+      var c = (i & 0x00FFFFFF)
+      .toString(16)
+      .toUpperCase();
+
+      return "00000".substring(0, 6 - c.length) + c;
+    }
+  </script>
+</body>
+</html>

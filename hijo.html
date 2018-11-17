@@ -1,0 +1,130 @@
+<!-- https://es.stackoverflow.com/q/207601/81450 -->
+<!--Hijo-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Emisor y Receptor Prueba</title>
+</head>
+<body>
+  <h1 class="prueba">Claseee L</h1>
+  <button id="elBotonSaludar">Saludar Parent</button>
+  <p>
+    <input id="laBusqueda" name="laBusqueda" type="text" />
+    <!--Boton que genera la accion en el padre -->
+    <button id="elBotonBuscar">1. Buscar (Desde iFrame)</button>
+    <button id="elOtroBoton">2. Oprima porfavor (Desde iFrame)</button>
+  </p>
+  <div id="losMensajes"></div>
+
+
+  <script>
+
+  window.addEventListener("message", recibirMensages, false);
+
+  function recibirMensages(ev)
+  {
+    /*
+    // Para seguridad verificar el dominio de origen aqui
+    if (ev.origin !== "http://example.org:8080")
+    return;
+    //*/
+
+    // Mostramos por consola el origen, tipo y mensaje crudo
+    console.log(ev.origin, typeof ev.data, ev.data);
+
+    // si es string lo añadimos como texto al div "losMensajes"
+    // intToRGB(hashCode(ev.data.accion)) es usado
+    // para colorear segun el texto
+    if('string'==typeof ev.data){
+      document.getElementById('losMensajes').innerHTML +=
+        '<span style="color:#'+intToRGB(hashCode(ev.data))+'">'+
+        '('+ev.origin+') dice:</span> ' +
+        ev.data + "<br/>";
+    }
+
+
+    // Definimos como procesar los mensajes
+
+    // si es string y es "soy tu padre", responder "Noooo"
+    // usamos el origen del evento como destinatario
+
+    if(
+      'string' == typeof ev.data &&
+      'soy tu padre' == ev.data.toLowerCase()
+    ){
+      event.source.postMessage(
+      "Nooooo",
+      event.origin
+      );
+    }
+  }
+
+  // definimos destinatario
+  var soyTuPadre = window.parent;
+
+  // Saludo Genérico
+  document.getElementById('elBotonSaludar').onclick = function(){
+    soyTuPadre.postMessage("Hola Ancestro!", '*');
+  }
+
+  // Mensaje personalizado :
+  // enviamos un objeto con instruccion de "buscar" y el texto a buscar
+  document.getElementById('elBotonBuscar').onclick = function(){
+    var mensajeParaEnviar = {
+      accion : 'buscar',
+      cosas  : document.getElementById('laBusqueda').value,
+    }
+    // Para seguridad definir el dominio de origen aqui en vez de '*'
+    soyTuPadre.postMessage( mensajeParaEnviar, '*' );
+  }
+
+  // Mensaje personalizado :
+  // enviamos un objeto con instruccion de "cambiar" y las cosas
+  document.getElementById('elOtroBoton').onclick = function(){
+    var mensajeParaEnviar = {
+      accion : 'cambiar',
+      cosas  : {
+        'h1' : {
+          clase : 'cambiado',
+          estilos : {color : '#f00'},
+        },
+        'h2' : {
+          clase : 'cambiado',
+          estilos : {display : 'none'},
+        },
+        'div#losMensajes' : {
+          clase : 'otraclase',
+          estilos : {
+            border : '1px dashed red',
+            borderRadius : '10px',
+            padding : '5px',
+            margin : '5px'
+          },
+        }
+      },
+    }
+    // Para seguridad definir el dominio de origen aqui en vez de '*'
+    soyTuPadre.postMessage( mensajeParaEnviar, '*' );
+  }
+
+
+  //** extras **//
+  /* https://stackoverflow.com/a/3426956/1423096 */
+  function hashCode(str) { // java String#hashCode
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+         hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return hash;
+  }
+
+  function intToRGB(i){
+      var c = (i & 0x00FFFFFF)
+          .toString(16)
+          .toUpperCase();
+
+      return "00000".substring(0, 6 - c.length) + c;
+  }
+  </script>
+  </body>
+  </html>
