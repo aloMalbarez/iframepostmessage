@@ -3,7 +3,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Emisor y Receptor Prueba</title>
+  <style>
+  #logs {
+    height: 160px;
+    overflow-y: scroll;
+    min-width: 50vw;
+    background: #fafafa;
+    border: 1px solid #ccc;
+  }
+  .buscadoriframe{
+    float:left;
+    border:1px solid black;
+  }
+  hr {
+    width:100%;
+    clear:both;
+    float:none;
+  }
+  .otraclase{
+    color:blue;
+  }
+  </style>
 </head>
 <body>
   <div style="width:45%; float:left;">
@@ -16,12 +38,22 @@
       <button id="elBoton">Oprima porfavor (Desde parent)</button>
     </p>
     <br />
-    <div id="losMensajes"></div>
+    <div id="losMensajes">div#losMensajes esto es de prueba</div>
   </div>
-  <iframe id="elIframe" class="buscadoriframe" src="hijo.html" width="45%" height="320px;" style="float:left;"></iframe>
-
-  <iframe id="elIframe2" class="buscadoriframe" src="http://shark-788.getforge.io/hijo.html" width="45%" height="320px;" style="float:left;"></iframe>
-  <iframe id="elIframe3" class="buscadoriframe" src="https://alomalbarez.github.io/iframepostmessage/hijo.html" width="45%" height="320px;" style="float:left;"></iframe>
+  <div id="logs"></div>
+  <hr />
+  <iframe
+  id="elIframe" class="buscadoriframe" width="33%" height="320px;"
+  src="hijo.html"
+  ></iframe>
+  <iframe
+  id="elIframe2" class="buscadoriframe" width="33%" height="320px;"
+  src="http://shark-788.getforge.io/hijo.html"
+  ></iframe>
+  <iframe
+  id="elIframe3" class="buscadoriframe" width="33%" height="320px;"
+  src="https://alomalbarez.github.io/iframepostmessage/hijo.html"
+  ></iframe>
 
   <script>
 
@@ -42,10 +74,11 @@
     // intToRGB(hashCode(ev.data.accion)) es usado
     // para colorear segun el texto
     if('string'==typeof ev.data){
-      document.getElementById('losMensajes').innerHTML +=
-      '<span style="color:#'+intToRGB(hashCode(ev.data))+'">'+
-      '('+ev.origin+') dice:</span> ' +
-      ev.data + "<br/>";
+      consolog(
+        '<span style="color:#'+intToRGB(hashCode(ev.origin+ev.data))+'">'+
+        '('+ev.origin+') dice:</span> ' +
+        ev.data + "<br/>"
+      );
     }
 
     // si es object buscamos que sea una accion y que hacer
@@ -55,11 +88,12 @@
       // intToRGB(hashCode(ev.data.accion)) es usado
       // para colorear segun la accion
       if(ev.data.accion && ev.data.cosas){
-        document.getElementById('losMensajes').innerHTML +=
+        consolog(
         '<span style="color:#'+intToRGB(hashCode(ev.data.accion))+'">'+
           '('+ev.origin+') dice:</span> ' +
           ev.data.accion + " " +
-          JSON.stringify(ev.data.cosas) + "<br/>";
+          JSON.stringify(ev.data.cosas) + "<br/>"
+        );
 
           // aquí según el tipo de accion
           // procesamos las cosas de manera diferente
@@ -67,14 +101,24 @@
           switch (ev.data.accion){
             // si es buscar, mentir
             case 'buscar':
-            document.getElementById('losMensajes').innerHTML +=
-            "[*] Estoy buscando " + ev.data.cosas + "<br/>";
+            consolog(
+              "[*] Estoy buscando " + ev.data.cosas + "<br/>"
+            );
+            event.source.postMessage(  // respondemos al que envió el mensaje
+              "*** Busqué " + ev.data.cosas + ". No hay resultados =/",
+              event.origin
+            );
             break;
 
             // si es cambiar, buscar que cambiar y como
             case 'cambiar':
-            document.getElementById('losMensajes').innerHTML +=
-            "[*] Estoy cambiando cosas<br/>";
+            consolog(
+              "[*] Estoy cambiando cosas<br/>"
+            );
+            event.source.postMessage(  // respondemos al que envió el mensaje
+              "*** Estoy cambiando cosas<br/>",
+              event.origin
+            );
 
             // recorremos las cosas
             for (var que in ev.data.cosas){
@@ -82,9 +126,10 @@
               // hay una clase para agregar?
               if (ev.data.cosas[que].clase){
                 // avisamos que hacemos
-                document.getElementById('losMensajes').innerHTML +=
-                '[**] agregandole la clase "' +
-                ev.data.cosas[que].clase + '" a "' + que + '"<br/>';
+                consolog(
+                  '[**] agregandole la clase "' +
+                  ev.data.cosas[que].clase + '" a "' + que + '"<br/>'
+                );
                 // lo hacemos :
                 // para cada elemento encontrado agregar la clase
                 document.querySelectorAll(que).forEach(function(el){
@@ -95,9 +140,10 @@
               // hay estilos para cambiar?
               if (ev.data.cosas[que].estilos){
                 // avisamos que hacemos
-                document.getElementById('losMensajes').innerHTML +=
-                '[**] agregandole estilos "' +
-                JSON.stringify(ev.data.cosas[que].estilos) + '" a "' + que + '"<br/>';
+                consolog(
+                  '[**] agregandole estilos "' +
+                  JSON.stringify(ev.data.cosas[que].estilos) + '" a "' + que + '"<br/>'
+                );
                 // lo hacemos :
                 // para cada elemento encontrado cambiar los estilos
                 document.querySelectorAll(que).forEach(function(el){
@@ -169,6 +215,16 @@
 
       return "00000".substring(0, 6 - c.length) + c;
     }
+
+    // para que el log no tape las cosas
+    var consolog = function(...cosas) {
+      var logs = document.getElementById('logs');
+      cosas.forEach((t) => {
+        logs.innerHTML += t + " ";
+      });
+      logs.innerHTML += "\n";
+      logs.scrollTop = logs.scrollHeight;
+    };
   </script>
 </body>
 </html>
