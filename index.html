@@ -25,6 +25,17 @@
   .otraclase{
     color:blue;
   }
+  .cambiado::after{
+    content: "cambiado";
+    font-size:10px;
+    font-family: 'verdana';
+    display: inline-block;
+    color:#000;
+    margin:2px;
+    padding:2px 5px;
+    background: #dadada;
+    border-radius : 10px;
+  }
   </style>
 </head>
 <body>
@@ -54,177 +65,196 @@
   id="elIframe3" class="buscadoriframe" width="33%" height="320px;"
   src="https://alomalbarez.github.io/iframepostmessage/hijo.html"
   ></iframe>
-
+  <hr />
+  <h4>refs, source, etc..</h4>
+  <ul>
+    <li>SO es: <a target="_blank"
+      href="https://es.stackoverflow.com/q/207601/81450"
+      >Modificar elementos de pagina padre iframe</a>
+    </li>
+    <li>MDN : <a target="_blank"
+      href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage"
+      >Window.postMessage()</a>
+    </li>
+    <li>SO en: <a target="_blank"
+      href="https://stackoverflow.com/a/3426956/1423096"
+      >Create a hexadecimal colour based on a string with JavaScript</a>
+    </li>
+    <li>github: <a target="_blank"
+      href="https://github.com/aloMalbarez/iframepostmessage"
+      >iframepostmessage Source</a>
+    </li>
+  </ul>
   <script>
 
-  window.addEventListener("message", recibirMensages, false);
+    window.addEventListener("message", recibirMensages, false);
 
-  function recibirMensages(ev)
-  {
-    /*
-    // Para seguridad verificar el dominio de origen aqui
-    if (ev.origin !== "http://example.org:8080")
-    return;
-    //*/
+    function recibirMensages(ev)
+    {
+      /*
+      // Para seguridad verificar el dominio de origen aqui
+      if (ev.origin !== "http://example.org:8080")
+      return;
+      //*/
 
-    // Mostramos por consola el origen, tipo y mensaje crudo
-    console.log(ev.origin, typeof ev.data, ev.data);
+      // Mostramos por consola el origen, tipo y mensaje crudo
+      console.log(ev.origin, typeof ev.data, ev.data);
 
-    // si es string lo añadimos como texto al div "losMensajes"
-    // intToRGB(hashCode(ev.data.accion)) es usado
-    // para colorear segun el texto
-    if('string'==typeof ev.data){
-      consolog(
-        '<span style="color:#'+intToRGB(hashCode(ev.origin+ev.data))+'">'+
-        '('+ev.origin+') dice:</span> ' +
-        ev.data + "<br/>"
-      );
-    }
-
-    // si es object buscamos que sea una accion y que hacer
-    if('object'==typeof ev.data){
-      // si accion esta definido y cosas no está vacío
-      //  lo añadimos como texto al div "losMensajes"
+      // si es string lo añadimos como texto al div "losMensajes"
       // intToRGB(hashCode(ev.data.accion)) es usado
-      // para colorear segun la accion
-      if(ev.data.accion && ev.data.cosas){
+      // para colorear segun el texto
+      if('string'==typeof ev.data){
         consolog(
-        '<span style="color:#'+intToRGB(hashCode(ev.data.accion))+'">'+
+        '<span style="color:#'+intToRGB(hashCode(ev.origin+ev.data))+'">'+
           '('+ev.origin+') dice:</span> ' +
-          ev.data.accion + " " +
-          JSON.stringify(ev.data.cosas) + "<br/>"
-        );
+          ev.data + "<br/>"
+          );
+        }
 
-          // aquí según el tipo de accion
-          // procesamos las cosas de manera diferente
-
-          switch (ev.data.accion){
-            // si es buscar, mentir
-            case 'buscar':
+        // si es object buscamos que sea una accion y que hacer
+        if('object'==typeof ev.data){
+          // si accion esta definido y cosas no está vacío
+          //  lo añadimos como texto al div "losMensajes"
+          // intToRGB(hashCode(ev.data.accion)) es usado
+          // para colorear segun la accion
+          if(ev.data.accion && ev.data.cosas){
             consolog(
-              "[*] Estoy buscando " + ev.data.cosas + "<br/>"
-            );
-            event.source.postMessage(  // respondemos al que envió el mensaje
-              "*** Busqué " + ev.data.cosas + ". No hay resultados =/",
-              event.origin
-            );
-            break;
+            '<span style="color:#'+intToRGB(hashCode(ev.data.accion))+'">'+
+              '('+ev.origin+') dice:</span> ' +
+              ev.data.accion + " " +
+              JSON.stringify(ev.data.cosas) + "<br/>"
+              );
 
-            // si es cambiar, buscar que cambiar y como
-            case 'cambiar':
-            consolog(
-              "[*] Estoy cambiando cosas<br/>"
-            );
-            event.source.postMessage(  // respondemos al que envió el mensaje
-              "*** Estoy cambiando cosas<br/>",
-              event.origin
-            );
+              // aquí según el tipo de accion
+              // procesamos las cosas de manera diferente
 
-            // recorremos las cosas
-            for (var que in ev.data.cosas){
-
-              // hay una clase para agregar?
-              if (ev.data.cosas[que].clase){
-                // avisamos que hacemos
+              switch (ev.data.accion){
+                // si es buscar, mentir
+                case 'buscar':
                 consolog(
-                  '[**] agregandole la clase "' +
-                  ev.data.cosas[que].clase + '" a "' + que + '"<br/>'
+                "[*] Estoy buscando " + ev.data.cosas + "<br/>"
                 );
-                // lo hacemos :
-                // para cada elemento encontrado agregar la clase
-                document.querySelectorAll(que).forEach(function(el){
-                  el.classList.add(ev.data.cosas[que].clase)
-                })
-              }
+                event.source.postMessage(  // respondemos al que envió el mensaje
+                "*** Busqué " + ev.data.cosas + ". No hay resultados =/",
+                event.origin
+                );
+                break;
 
-              // hay estilos para cambiar?
-              if (ev.data.cosas[que].estilos){
-                // avisamos que hacemos
+                // si es cambiar, buscar que cambiar y como
+                case 'cambiar':
                 consolog(
-                  '[**] agregandole estilos "' +
-                  JSON.stringify(ev.data.cosas[que].estilos) + '" a "' + que + '"<br/>'
+                "[*] Estoy cambiando cosas<br/>"
                 );
-                // lo hacemos :
-                // para cada elemento encontrado cambiar los estilos
-                document.querySelectorAll(que).forEach(function(el){
-                  // cambiamos los estilos uno por uno
-                  for(var e in ev.data.cosas[que].estilos) {
-                    el.style[e] = ev.data.cosas[que].estilos[e];
+                event.source.postMessage(  // respondemos al que envió el mensaje
+                "*** Estoy cambiando cosas<br/>",
+                event.origin
+                );
+
+                // recorremos las cosas
+                for (var que in ev.data.cosas){
+
+                  // hay una clase para agregar?
+                  if (ev.data.cosas[que].clase){
+                    // avisamos que hacemos
+                    consolog(
+                    '[**] agregandole la clase "' +
+                    ev.data.cosas[que].clase + '" a "' + que + '"<br/>'
+                    );
+                    // lo hacemos :
+                    // para cada elemento encontrado agregar la clase
+                    document.querySelectorAll(que).forEach(function(el){
+                      el.classList.add(ev.data.cosas[que].clase)
+                    })
                   }
-                })
+
+                  // hay estilos para cambiar?
+                  if (ev.data.cosas[que].estilos){
+                    // avisamos que hacemos
+                    consolog(
+                    '[**] agregandole estilos "' +
+                    JSON.stringify(ev.data.cosas[que].estilos) + '" a "' + que + '"<br/>'
+                    );
+                    // lo hacemos :
+                    // para cada elemento encontrado cambiar los estilos
+                    document.querySelectorAll(que).forEach(function(el){
+                      // cambiamos los estilos uno por uno
+                      for(var e in ev.data.cosas[que].estilos) {
+                        el.style[e] = ev.data.cosas[que].estilos[e];
+                      }
+                    })
+                  }
+                }
+                break;
+
               }
             }
-            break;
-
           }
+
+
+          // Definimos como procesar los mensajes
         }
-      }
+
+        var soyTuHijo = document.getElementById('elIframe').contentWindow;
+        var soyTuHijo2 = document.getElementById('elIframe2').contentWindow;
+        var soyTuHijo3 = document.getElementById('elIframe3').contentWindow;
+        // Saludo Genérico
+        document.getElementById('elBotonSaludar').onclick = function(){
+          // Para seguridad definir el dominio de origen aqui en vez de '*'
+          soyTuHijo.postMessage(
+          "Hola Luke! (1)",
+          '*'
+          );
+
+          soyTuHijo2.postMessage(
+          "Hola Luke! (2)",
+          '*'
+          );
+
+          soyTuHijo3.postMessage(
+          "Hola Luke! (3)",
+          '*'
+          );
+        }
+
+        // Mensaje personalizado :
+        // enviamos el valor del input como string
+        document.getElementById('elBoton').onclick = function(){
+          var mensajeParaEnviar = document.getElementById('elTexto').value;
+
+          // Para seguridad definir el dominio de origen aqui en vez de '*'
+          soyTuHijo.postMessage( mensajeParaEnviar, '*' );
+          soyTuHijo2.postMessage( mensajeParaEnviar, '*' );
+          soyTuHijo3.postMessage( mensajeParaEnviar, '*' );
+        }
 
 
-      // Definimos como procesar los mensajes
-    }
+        //** extras **//
+        /* https://stackoverflow.com/a/3426956/1423096 */
+        function hashCode(str) { // java String#hashCode
+          var hash = 0;
+          for (var i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+          }
+          return hash;
+        }
 
-    var soyTuHijo = document.getElementById('elIframe').contentWindow;
-    var soyTuHijo2 = document.getElementById('elIframe2').contentWindow;
-    var soyTuHijo3 = document.getElementById('elIframe3').contentWindow;
-    // Saludo Genérico
-    document.getElementById('elBotonSaludar').onclick = function(){
-      // Para seguridad definir el dominio de origen aqui en vez de '*'
-      soyTuHijo.postMessage(
-      "Hola Luke! (1)",
-      '*'
-      );
+        function intToRGB(i){
+          var c = (i & 0x00FFFFFF)
+          .toString(16)
+          .toUpperCase();
 
-      soyTuHijo2.postMessage(
-      "Hola Luke! (2)",
-      '*'
-      );
+          return "00000".substring(0, 6 - c.length) + c;
+        }
 
-      soyTuHijo3.postMessage(
-      "Hola Luke! (3)",
-      '*'
-      );
-    }
-
-    // Mensaje personalizado :
-    // enviamos el valor del input como string
-    document.getElementById('elBoton').onclick = function(){
-      var mensajeParaEnviar = document.getElementById('elTexto').value;
-
-      // Para seguridad definir el dominio de origen aqui en vez de '*'
-      soyTuHijo.postMessage( mensajeParaEnviar, '*' );
-      soyTuHijo2.postMessage( mensajeParaEnviar, '*' );
-      soyTuHijo3.postMessage( mensajeParaEnviar, '*' );
-    }
-
-
-    //** extras **//
-    /* https://stackoverflow.com/a/3426956/1423096 */
-    function hashCode(str) { // java String#hashCode
-      var hash = 0;
-      for (var i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      return hash;
-    }
-
-    function intToRGB(i){
-      var c = (i & 0x00FFFFFF)
-      .toString(16)
-      .toUpperCase();
-
-      return "00000".substring(0, 6 - c.length) + c;
-    }
-
-    // para que el log no tape las cosas
-    var consolog = function(...cosas) {
-      var logs = document.getElementById('logs');
-      cosas.forEach((t) => {
-        logs.innerHTML += t + " ";
-      });
-      logs.innerHTML += "\n";
-      logs.scrollTop = logs.scrollHeight;
-    };
-  </script>
-</body>
-</html>
+        // para que el log no tape las cosas
+        var consolog = function(...cosas) {
+          var logs = document.getElementById('logs');
+          cosas.forEach((t) => {
+            logs.innerHTML += t + " ";
+          });
+          logs.innerHTML += "\n";
+          logs.scrollTop = logs.scrollHeight;
+        };
+      </script>
+    </body>
+    </html>
