@@ -119,11 +119,23 @@
     }
 
     var soyTuHijo = document.getElementById('elIframe').contentWindow;
+    var soyTuHijo2 = document.getElementById('elIframe2').contentWindow;
+    var soyTuHijo3 = document.getElementById('elIframe3').contentWindow;
     // Saludo Genérico
     document.getElementById('elBotonSaludar').onclick = function(){
       // Para seguridad definir el dominio de origen aqui en vez de '*'
       soyTuHijo.postMessage(
-      "Hola Luke!",
+      "Hola Luke! (1)",
+      '*'
+      );
+
+      soyTuHijo2.postMessage(
+      "Hola Luke! (2)",
+      '*'
+      );
+
+      soyTuHijo3.postMessage(
+      "Hola Luke! (3)",
       '*'
       );
     }
@@ -135,6 +147,8 @@
 
       // Para seguridad definir el dominio de origen aqui en vez de '*'
       soyTuHijo.postMessage( mensajeParaEnviar, '*' );
+      soyTuHijo2.postMessage( mensajeParaEnviar, '*' );
+      soyTuHijo3.postMessage( mensajeParaEnviar, '*' );
     }
 
 
